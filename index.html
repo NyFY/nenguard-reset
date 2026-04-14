@@ -175,7 +175,7 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3bGRydm9sbWRseHZjZGJmaGt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMzNTk5NzQsImV4cCI6MjA1ODkzNTk3NH0.YESMystDBaJvMGwExTz3p-O-k8FvcEqSa8OjJBR53ls';
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: { flowType: 'pkce', autoRefreshToken: false, persistSession: false, detectSessionInUrl: false }
+            auth: { flowType: 'pkce', autoRefreshToken: false, persistSession: true, detectSessionInUrl: true }
         });
 
         function showForm() {
@@ -196,37 +196,44 @@
         }
 
         async function init() {
-            const params = new URLSearchParams(window.location.search);
-            const hash = new URLSearchParams(window.location.hash.substring(1));
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const hash = new URLSearchParams(window.location.hash.substring(1));
 
-            // Error from Supabase (e.g. expired link) often comes as hash params
-            if (hash.get('error')) {
-                const desc = hash.get('error_description') || hash.get('error');
-                showInvalid('Fehler: ' + decodeURIComponent(desc.replace(/\+/g, ' ')));
-                return;
-            }
-
-            // Preferred path: token_hash from the custom email template
-            const tokenHash = params.get('token_hash');
-            const type = params.get('type') || 'recovery';
-
-            if (tokenHash) {
-                const { data, error } = await supabase.auth.verifyOtp({
-                    token_hash: tokenHash,
-                    type: type
-                });
-                if (error || !data.session) {
-                    showInvalid('Der Link ist ungültig oder abgelaufen.');
+                // Error from Supabase
+                if (hash.get('error')) {
+                    const desc = hash.get('error_description') || hash.get('error');
+                    showInvalid('Fehler: ' + decodeURIComponent(desc.replace(/\+/g, ' ')));
                     return;
                 }
-                window.history.replaceState({}, document.title, window.location.pathname);
-                showForm();
-                return;
-            }
 
-            // Fallback 1: PKCE code flow (?code=xxx)
-            const code = params.get('code');
-            if (code) {
+                // Path 1: token_hash from custom email template
+                const tokenHash = params.get('token_hash');
+                const type = params.get('type') || 'recovery';
+
+                if (tokenHash) {
+                    console.log('Verifying token_hash:', tokenHash.substring(0, 10) + '...');
+                    const { data, error } = await supabase.auth.verifyOtp({
+                        token_hash: tokenHash,
+                        type: type
+                    });
+                    console.log('verifyOtp result:', { data: !!data?.session, error: error?.message });
+                    if (error) {
+                        showInvalid('Der Link ist ungültig oder abgelaufen. (' + error.message + ')');
+                        return;
+                    }
+                    if (!data?.session) {
+                        showInvalid('Sitzung konnte nicht erstellt werden. Bitte fordern Sie einen neuen Link an.');
+                        return;
+                    }
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    showForm();
+                    return;
+                }
+
+                // Path 2: PKCE code flow (?code=xxx)
+                const code = params.get('code');
+                if (code) {
                 const { data, error } = await supabase.auth.exchangeCodeForSession(code);
                 if (error || !data.session) {
                     showInvalid('Der Link ist ungültig oder abgelaufen.');
@@ -255,6 +262,10 @@
             }
 
             showInvalid('Kein gültiger Reset-Token gefunden. Bitte fordern Sie in der App einen neuen Link an.');
+            } catch (e) {
+                console.error('Init error:', e);
+                showInvalid('Ein Fehler ist aufgetreten: ' + e.message);
+            }
         }
 
         async function resetPassword() {
