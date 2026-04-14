@@ -166,10 +166,26 @@
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Try to get session from URL hash (Supabase sends tokens in fragment)
+        // Handle PKCE code exchange + session recovery
         async function init() {
+            // PKCE flow: Supabase sends ?code=xxx in the URL
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+
+            if (code) {
+                // Exchange the PKCE code for a session
+                const { error } = await supabase.auth.exchangeCodeForSession(code);
+                if (error) {
+                    showError('Ungültiger oder abgelaufener Link. Bitte fordern Sie einen neuen Link an.');
+                    return;
+                }
+                // Clean URL so the code doesn't stay in browser history
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            // Verify we have an active session
             const { data, error } = await supabase.auth.getSession();
-            if (error) {
+            if (error || !data.session) {
                 showError('Ungültiger oder abgelaufener Link. Bitte fordern Sie einen neuen Link an.');
             }
         }
