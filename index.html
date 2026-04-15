@@ -144,12 +144,25 @@
         return;
     }
 
+    // In-memory storage — we need persistSession:true so the client keeps the session
+    // from verifyOtp alive for the subsequent updateUser call, but we don't want anything
+    // written to localStorage since this is a short-lived reset page.
+    var memoryStore = (function () {
+        var store = {};
+        return {
+            getItem: function (k) { return store[k] || null; },
+            setItem: function (k, v) { store[k] = v; },
+            removeItem: function (k) { delete store[k]; }
+        };
+    })();
+
     var sb = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
             flowType: 'implicit',
             autoRefreshToken: false,
-            persistSession: false,
-            detectSessionInUrl: false
+            persistSession: true,
+            detectSessionInUrl: false,
+            storage: memoryStore
         }
     });
 
