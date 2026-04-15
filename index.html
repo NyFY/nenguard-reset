@@ -135,7 +135,9 @@
     'use strict';
 
     var SUPABASE_URL = 'https://awldrvolmdlxvcdbfhkz.supabase.co';
-    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3bGRydm9sbWRseHZjZGJmaGt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMzNTk5NzQsImV4cCI6MjA1ODkzNTk3NH0.YESMystDBaJvMGwExTz3p-O-k8FvcEqSa8OjJBR53ls';
+    // Use the new publishable key (sb_publishable_...) — the legacy JWT anon key
+    // is rejected by PUT /auth/v1/user in the 2024+ Supabase auth stack.
+    var SUPABASE_ANON_KEY = 'sb_publishable_HhOvZFFjZTAX-pbqTmkdpA_GvIKUJVZ';
 
     // Use a distinct local variable name to avoid any collision with window.supabase
     var sbLib = window.supabase;
