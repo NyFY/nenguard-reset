@@ -14,311 +14,297 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            color: #082540;
         }
         .card {
-            background: white;
+            background: #fff;
             border-radius: 16px;
             padding: 40px;
             max-width: 420px;
             width: 100%;
-            box-shadow: 0 4px 24px rgba(8,37,64,0.08);
+            box-shadow: 0 4px 24px rgba(8, 37, 64, 0.08);
         }
         .logo { text-align: center; margin-bottom: 24px; }
         .logo svg { width: 48px; height: 48px; }
-        .logo h1 {
-            font-size: 24px;
-            color: #082540;
-            margin-top: 8px;
-        }
-        .logo p {
-            color: #6B7B8D;
-            font-size: 14px;
-            margin-top: 4px;
-        }
+        .logo h1 { font-size: 24px; margin-top: 8px; color: #082540; }
+        .logo p { color: #6B7B8D; font-size: 14px; margin-top: 4px; }
         label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #082540;
-            margin-bottom: 6px;
-            margin-top: 16px;
+            display: block; font-size: 13px; font-weight: 600;
+            color: #082540; margin-bottom: 6px; margin-top: 16px;
         }
         input[type="password"] {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid #D1DBE5;
-            border-radius: 10px;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.2s;
+            width: 100%; padding: 12px 14px; border: 1.5px solid #D1DBE5;
+            border-radius: 10px; font-size: 16px; outline: none;
+            transition: border-color 0.2s; font-family: inherit;
         }
-        input[type="password"]:focus {
-            border-color: #4B91B9;
-        }
+        input[type="password"]:focus { border-color: #4B91B9; }
+        .hint { font-size: 12px; color: #6B7B8D; margin-top: 6px; }
         .btn {
-            width: 100%;
-            padding: 14px;
-            background: #4B91B9;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 24px;
+            width: 100%; padding: 14px; background: #4B91B9; color: #fff;
+            border: none; border-radius: 10px; font-size: 16px;
+            font-weight: 600; cursor: pointer; margin-top: 24px;
             transition: background 0.2s;
         }
-        .btn:hover { background: #3A7A9E; }
-        .btn:disabled {
-            background: #B0C4D4;
-            cursor: not-allowed;
-        }
+        .btn:hover:not(:disabled) { background: #3A7A9E; }
+        .btn:disabled { background: #B0C4D4; cursor: not-allowed; }
         .error {
-            background: #FFF0F0;
-            color: #C62828;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-top: 16px;
+            background: #FFF0F0; color: #C62828; padding: 10px 14px;
+            border-radius: 8px; font-size: 13px; margin-top: 16px;
             display: none;
         }
-        .success, .invalid {
-            text-align: center;
-            display: none;
+        .loading { display: none; text-align: center; margin-top: 12px; color: #4B91B9; font-size: 13px; }
+        .state { display: none; }
+        .state.active { display: block; }
+        .center-state { text-align: center; }
+        .center-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .state h2 { font-size: 20px; margin-bottom: 8px; }
+        .state.success h2 { color: #2E7D32; }
+        .state.invalid h2 { color: #C62828; }
+        .state p { color: #6B7B8D; font-size: 14px; }
+        .app-link {
+            display: inline-block; margin-top: 20px; padding: 12px 24px;
+            background: #082540; color: #fff; text-decoration: none;
+            border-radius: 10px; font-weight: 600;
         }
-        .success .icon, .invalid .icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+        .spinner {
+            width: 32px; height: 32px; border: 3px solid #EAF5FA;
+            border-top-color: #4B91B9; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 16px;
         }
-        .success h2 { color: #2E7D32; font-size: 20px; margin-bottom: 8px; }
-        .invalid h2 { color: #C62828; font-size: 20px; margin-bottom: 8px; }
-        .success p, .invalid p { color: #6B7B8D; font-size: 14px; }
-        .success .app-link, .invalid .app-link {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 24px;
-            background: #082540;
-            color: white;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-        }
-        .hint { font-size: 12px; color: #6B7B8D; margin-top: 6px; }
-        .loading { display: none; text-align: center; margin-top: 16px; color: #4B91B9; }
-        .initializing { text-align: center; color: #6B7B8D; padding: 20px 0; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="card">
-        <!-- Initializing State (shown while verifying token) -->
-        <div id="init-section" class="initializing">
-            <div class="logo">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="48" height="48" rx="12" fill="#082540"/>
-                    <path d="M24 8L36 16V28C36 34 30 39 24 40C18 39 12 34 12 28V16L24 8Z" stroke="white" stroke-width="2.5" fill="none"/>
-                    <rect x="18" y="20" width="12" height="10" rx="2" stroke="white" stroke-width="2"/>
-                    <circle cx="24" cy="25" r="1.5" fill="white"/>
-                    <line x1="24" y1="25" x2="24" y2="28" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <h1>NENGuard</h1>
-                <p>Link wird geprüft...</p>
-            </div>
-        </div>
+<div class="card">
 
-        <!-- Form (hidden until session ready) -->
-        <div id="form-section" style="display: none;">
-            <div class="logo">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="48" height="48" rx="12" fill="#082540"/>
-                    <path d="M24 8L36 16V28C36 34 30 39 24 40C18 39 12 34 12 28V16L24 8Z" stroke="white" stroke-width="2.5" fill="none"/>
-                    <rect x="18" y="20" width="12" height="10" rx="2" stroke="white" stroke-width="2"/>
-                    <circle cx="24" cy="25" r="1.5" fill="white"/>
-                    <line x1="24" y1="25" x2="24" y2="28" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-                <h1>NENGuard</h1>
-                <p>Neues Passwort festlegen</p>
-            </div>
-
-            <label for="password">Neues Passwort</label>
-            <input type="password" id="password" placeholder="Mindestens 8 Zeichen" autocomplete="new-password">
-            <p class="hint">Min. 8 Zeichen, Groß-/Kleinbuchstaben, Zahl</p>
-
-            <label for="confirm">Passwort bestätigen</label>
-            <input type="password" id="confirm" placeholder="Passwort wiederholen" autocomplete="new-password">
-
-            <div class="error" id="error"></div>
-            <div class="loading" id="loading">Wird gespeichert...</div>
-
-            <button class="btn" id="submit-btn" onclick="resetPassword()">Passwort ändern</button>
-        </div>
-
-        <!-- Success -->
-        <div class="success" id="success-section">
-            <div class="icon">✅</div>
-            <h2>Passwort geändert</h2>
-            <p>Ihr Passwort wurde erfolgreich geändert. Sie können sich jetzt mit dem neuen Passwort in der App anmelden.</p>
-            <a href="nenguard://auth-callback" class="app-link">App öffnen</a>
-        </div>
-
-        <!-- Invalid Link -->
-        <div class="invalid" id="invalid-section">
-            <div class="icon">⚠️</div>
-            <h2>Link ungültig oder abgelaufen</h2>
-            <p id="invalid-message">Bitte fordern Sie in der App einen neuen Link an.</p>
-            <a href="nenguard://auth-callback" class="app-link">App öffnen</a>
-        </div>
+    <!-- State 0: Verifying -->
+    <div id="state-verifying" class="state active center-state">
+        <div class="spinner"></div>
+        <h2 style="color:#082540;">Link wird geprüft</h2>
+        <p>Einen Moment bitte...</p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const SUPABASE_URL = 'https://awldrvolmdlxvcdbfhkz.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3bGRydm9sbWRseHZjZGJmaGt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMzNTk5NzQsImV4cCI6MjA1ODkzNTk3NH0.YESMystDBaJvMGwExTz3p-O-k8FvcEqSa8OjJBR53ls';
+    <!-- State 1: Form -->
+    <div id="state-form" class="state">
+        <div class="logo">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="48" height="48" rx="12" fill="#082540"/>
+                <path d="M24 8L36 16V28C36 34 30 39 24 40C18 39 12 34 12 28V16L24 8Z" stroke="#fff" stroke-width="2.5" fill="none"/>
+                <rect x="18" y="20" width="12" height="10" rx="2" stroke="#fff" stroke-width="2"/>
+                <circle cx="24" cy="25" r="1.5" fill="#fff"/>
+                <line x1="24" y1="25" x2="24" y2="28" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <h1>NENGuard</h1>
+            <p>Neues Passwort festlegen</p>
+        </div>
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: { flowType: 'pkce', autoRefreshToken: false, persistSession: true, detectSessionInUrl: true }
+        <label for="pw-new">Neues Passwort</label>
+        <input type="password" id="pw-new" placeholder="Mindestens 8 Zeichen" autocomplete="new-password">
+        <p class="hint">Min. 8 Zeichen, Groß-/Kleinbuchstaben, Zahl</p>
+
+        <label for="pw-confirm">Passwort bestätigen</label>
+        <input type="password" id="pw-confirm" placeholder="Passwort wiederholen" autocomplete="new-password">
+
+        <div id="form-error" class="error"></div>
+        <div id="form-loading" class="loading">Wird gespeichert...</div>
+
+        <button id="submit-btn" class="btn" type="button">Passwort ändern</button>
+    </div>
+
+    <!-- State 2: Success -->
+    <div id="state-success" class="state success center-state">
+        <div class="icon">✅</div>
+        <h2>Passwort geändert</h2>
+        <p>Ihr Passwort wurde erfolgreich geändert. Sie können sich jetzt mit dem neuen Passwort in der App anmelden.</p>
+        <a href="nenguard://auth-callback" class="app-link">App öffnen</a>
+    </div>
+
+    <!-- State 3: Invalid -->
+    <div id="state-invalid" class="state invalid center-state">
+        <div class="icon">⚠️</div>
+        <h2>Link ungültig oder abgelaufen</h2>
+        <p id="invalid-message">Bitte fordern Sie in der App einen neuen Link an.</p>
+        <a href="nenguard://auth-callback" class="app-link">App öffnen</a>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function () {
+    'use strict';
+
+    var SUPABASE_URL = 'https://awldrvolmdlxvcdbfhkz.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3bGRydm9sbWRseHZjZGJmaGt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMzNTk5NzQsImV4cCI6MjA1ODkzNTk3NH0.YESMystDBaJvMGwExTz3p-O-k8FvcEqSa8OjJBR53ls';
+
+    // Use a distinct local variable name to avoid any collision with window.supabase
+    var sbLib = window.supabase;
+    if (!sbLib || typeof sbLib.createClient !== 'function') {
+        showInvalid('Supabase-Bibliothek konnte nicht geladen werden. Bitte Seite neu laden.');
+        return;
+    }
+
+    var sb = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+            flowType: 'implicit',
+            autoRefreshToken: false,
+            persistSession: false,
+            detectSessionInUrl: false
+        }
+    });
+
+    function $(id) { return document.getElementById(id); }
+
+    function show(stateId) {
+        ['state-verifying', 'state-form', 'state-success', 'state-invalid'].forEach(function (id) {
+            var el = $(id);
+            if (el) el.classList.toggle('active', id === stateId);
         });
+    }
 
-        function showForm() {
-            document.getElementById('init-section').style.display = 'none';
-            document.getElementById('form-section').style.display = 'block';
+    function showInvalid(msg) {
+        if (msg) { var m = $('invalid-message'); if (m) m.textContent = msg; }
+        show('state-invalid');
+    }
+
+    function showFormError(msg) {
+        var el = $('form-error');
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function parseParams() {
+        var search = new URLSearchParams(window.location.search);
+        var hash = new URLSearchParams((window.location.hash || '').substring(1));
+        return {
+            token_hash: search.get('token_hash'),
+            type: search.get('type') || 'recovery',
+            code: search.get('code'),
+            access_token: hash.get('access_token'),
+            refresh_token: hash.get('refresh_token'),
+            error: hash.get('error') || search.get('error'),
+            error_description: hash.get('error_description') || search.get('error_description')
+        };
+    }
+
+    async function init() {
+        console.log('[NENGuard Reset] init start');
+        var p = parseParams();
+
+        if (p.error) {
+            var desc = decodeURIComponent((p.error_description || p.error).replace(/\+/g, ' '));
+            showInvalid('Fehler: ' + desc);
+            return;
         }
 
-        function showInvalid(msg) {
-            document.getElementById('init-section').style.display = 'none';
-            document.getElementById('form-section').style.display = 'none';
-            if (msg) document.getElementById('invalid-message').textContent = msg;
-            document.getElementById('invalid-section').style.display = 'block';
-        }
-
-        function showSuccess() {
-            document.getElementById('form-section').style.display = 'none';
-            document.getElementById('success-section').style.display = 'block';
-        }
-
-        async function init() {
+        // Path 1: token_hash (from our custom email template) — preferred
+        if (p.token_hash) {
+            console.log('[NENGuard Reset] trying verifyOtp with token_hash, type=' + p.type);
             try {
-                const params = new URLSearchParams(window.location.search);
-                const hash = new URLSearchParams(window.location.hash.substring(1));
-
-                // Error from Supabase
-                if (hash.get('error')) {
-                    const desc = hash.get('error_description') || hash.get('error');
-                    showInvalid('Fehler: ' + decodeURIComponent(desc.replace(/\+/g, ' ')));
-                    return;
-                }
-
-                // Path 1: token_hash from custom email template
-                const tokenHash = params.get('token_hash');
-                const type = params.get('type') || 'recovery';
-
-                if (tokenHash) {
-                    console.log('Verifying token_hash:', tokenHash.substring(0, 10) + '...');
-                    const { data, error } = await supabase.auth.verifyOtp({
-                        token_hash: tokenHash,
-                        type: type
-                    });
-                    console.log('verifyOtp result:', { data: !!data?.session, error: error?.message });
-                    if (error) {
-                        showInvalid('Der Link ist ungültig oder abgelaufen. (' + error.message + ')');
-                        return;
-                    }
-                    if (!data?.session) {
-                        showInvalid('Sitzung konnte nicht erstellt werden. Bitte fordern Sie einen neuen Link an.');
-                        return;
-                    }
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                    showForm();
-                    return;
-                }
-
-                // Path 2: PKCE code flow (?code=xxx)
-                const code = params.get('code');
-                if (code) {
-                const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-                if (error || !data.session) {
+                var r = await sb.auth.verifyOtp({ token_hash: p.token_hash, type: p.type });
+                if (r.error) {
+                    console.error('[NENGuard Reset] verifyOtp error', r.error);
                     showInvalid('Der Link ist ungültig oder abgelaufen.');
                     return;
                 }
+                if (!r.data || !r.data.session) {
+                    showInvalid('Sitzung konnte nicht erstellt werden.');
+                    return;
+                }
                 window.history.replaceState({}, document.title, window.location.pathname);
-                showForm();
+                show('state-form');
+                return;
+            } catch (e) {
+                console.error('[NENGuard Reset] verifyOtp threw', e);
+                showInvalid('Netzwerkfehler: ' + (e && e.message ? e.message : 'unbekannt'));
                 return;
             }
+        }
 
-            // Fallback 2: Implicit flow with tokens in hash
-            const accessToken = hash.get('access_token');
-            const refreshToken = hash.get('refresh_token');
-            if (accessToken && refreshToken) {
-                const { data, error } = await supabase.auth.setSession({
-                    access_token: accessToken,
-                    refresh_token: refreshToken
+        // Path 2: PKCE code (only if a code_verifier exists in storage — unlikely here)
+        if (p.code) {
+            console.log('[NENGuard Reset] trying exchangeCodeForSession');
+            try {
+                var r2 = await sb.auth.exchangeCodeForSession(p.code);
+                if (r2.error || !r2.data || !r2.data.session) {
+                    showInvalid('Der Link ist ungültig oder abgelaufen (PKCE-Code kann nicht ohne Verifier eingelöst werden).');
+                    return;
+                }
+                window.history.replaceState({}, document.title, window.location.pathname);
+                show('state-form');
+                return;
+            } catch (e) {
+                showInvalid('Netzwerkfehler beim Code-Austausch.');
+                return;
+            }
+        }
+
+        // Path 3: implicit flow tokens in hash
+        if (p.access_token && p.refresh_token) {
+            console.log('[NENGuard Reset] trying setSession from hash');
+            try {
+                var r3 = await sb.auth.setSession({
+                    access_token: p.access_token,
+                    refresh_token: p.refresh_token
                 });
-                if (error || !data.session) {
+                if (r3.error || !r3.data || !r3.data.session) {
                     showInvalid('Der Link ist ungültig oder abgelaufen.');
                     return;
                 }
                 window.history.replaceState({}, document.title, window.location.pathname);
-                showForm();
+                show('state-form');
                 return;
-            }
-
-            showInvalid('Kein gültiger Reset-Token gefunden. Bitte fordern Sie in der App einen neuen Link an.');
             } catch (e) {
-                console.error('Init error:', e);
-                showInvalid('Ein Fehler ist aufgetreten: ' + e.message);
+                showInvalid('Netzwerkfehler: ' + (e && e.message ? e.message : 'unbekannt'));
+                return;
             }
         }
 
-        async function resetPassword() {
-            const password = document.getElementById('password').value;
-            const confirm = document.getElementById('confirm').value;
-            const errorDiv = document.getElementById('error');
-            const loading = document.getElementById('loading');
-            const btn = document.getElementById('submit-btn');
+        showInvalid('Kein Reset-Token in der URL gefunden. Bitte fordern Sie in der App einen neuen Link an.');
+    }
 
-            errorDiv.style.display = 'none';
+    async function resetPassword() {
+        var pw = $('pw-new').value;
+        var pw2 = $('pw-confirm').value;
+        var err = $('form-error');
+        var loading = $('form-loading');
+        var btn = $('submit-btn');
 
-            if (password.length < 8) {
-                showError('Das Passwort muss mindestens 8 Zeichen lang sein.');
-                return;
-            }
-            if (password !== confirm) {
-                showError('Die Passwörter stimmen nicht überein.');
-                return;
-            }
+        err.style.display = 'none';
 
-            btn.disabled = true;
-            loading.style.display = 'block';
+        if (pw.length < 8) { showFormError('Das Passwort muss mindestens 8 Zeichen lang sein.'); return; }
+        if (pw !== pw2) { showFormError('Die Passwörter stimmen nicht überein.'); return; }
 
-            try {
-                const { data, error } = await supabase.auth.updateUser({ password: password });
+        btn.disabled = true;
+        loading.style.display = 'block';
 
-                if (error) {
-                    showError('Fehler: ' + error.message);
-                    btn.disabled = false;
-                    loading.style.display = 'none';
-                    return;
-                }
-
-                showSuccess();
-            } catch (e) {
-                showError('Ein Fehler ist aufgetreten: ' + e.message);
+        try {
+            var r = await sb.auth.updateUser({ password: pw });
+            if (r.error) {
+                showFormError('Fehler: ' + r.error.message);
                 btn.disabled = false;
                 loading.style.display = 'none';
+                return;
             }
+            show('state-success');
+        } catch (e) {
+            showFormError('Fehler: ' + (e && e.message ? e.message : 'unbekannt'));
+            btn.disabled = false;
+            loading.style.display = 'none';
         }
+    }
 
-        function showError(msg) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('confirm').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') resetPassword();
-            });
-            init();
+    document.addEventListener('DOMContentLoaded', function () {
+        $('submit-btn').addEventListener('click', resetPassword);
+        $('pw-confirm').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') resetPassword();
         });
-    </script>
+        init().catch(function (e) {
+            console.error('[NENGuard Reset] init crashed', e);
+            showInvalid('Ein Fehler ist aufgetreten: ' + (e && e.message ? e.message : 'unbekannt'));
+        });
+    });
+})();
+</script>
 </body>
 </html>
