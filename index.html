@@ -144,27 +144,18 @@
         return;
     }
 
-    // In-memory storage — we need persistSession:true so the client keeps the session
-    // from verifyOtp alive for the subsequent updateUser call, but we don't want anything
-    // written to localStorage since this is a short-lived reset page.
-    var memoryStore = (function () {
-        var store = {};
-        return {
-            getItem: function (k) { return store[k] || null; },
-            setItem: function (k, v) { store[k] = v; },
-            removeItem: function (k) { delete store[k]; }
-        };
-    })();
-
     var sb = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
             flowType: 'implicit',
             autoRefreshToken: false,
-            persistSession: true,
-            detectSessionInUrl: false,
-            storage: memoryStore
+            persistSession: false,
+            detectSessionInUrl: false
         }
     });
+
+    // Holds the access_token from verifyOtp so we can update the password directly
+    // via REST (more robust than relying on the SDK's internal session state).
+    var accessToken = null;
 
     function $(id) { return document.getElementById(id); }
 
@@ -224,6 +215,8 @@
                     showInvalid('Sitzung konnte nicht erstellt werden.');
                     return;
                 }
+                accessToken = r.data.session.access_token;
+                console.log('[NENGuard Reset] session obtained, token length:', (accessToken || '').length);
                 window.history.replaceState({}, document.title, window.location.pathname);
                 show('state-form');
                 return;
@@ -243,6 +236,7 @@
                     showInvalid('Der Link ist ungültig oder abgelaufen (PKCE-Code kann nicht ohne Verifier eingelöst werden).');
                     return;
                 }
+                accessToken = r2.data.session.access_token;
                 window.history.replaceState({}, document.title, window.location.pathname);
                 show('state-form');
                 return;
@@ -264,6 +258,7 @@
                     showInvalid('Der Link ist ungültig oder abgelaufen.');
                     return;
                 }
+                accessToken = r3.data.session.access_token;
                 window.history.replaceState({}, document.title, window.location.pathname);
                 show('state-form');
                 return;
@@ -287,20 +282,39 @@
 
         if (pw.length < 8) { showFormError('Das Passwort muss mindestens 8 Zeichen lang sein.'); return; }
         if (pw !== pw2) { showFormError('Die Passwörter stimmen nicht überein.'); return; }
+        if (!accessToken) { showFormError('Keine aktive Sitzung. Bitte Link erneut öffnen.'); return; }
 
         btn.disabled = true;
         loading.style.display = 'block';
 
         try {
-            var r = await sb.auth.updateUser({ password: pw });
-            if (r.error) {
-                showFormError('Fehler: ' + r.error.message);
+            // Direct REST call to PUT /auth/v1/user with explicit Bearer + apikey headers.
+            // This bypasses any SDK session-storage quirks.
+            var resp = await fetch(SUPABASE_URL + '/auth/v1/user', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password: pw })
+            });
+            var body = null;
+            try { body = await resp.json(); } catch (_) { body = null; }
+
+            if (!resp.ok) {
+                var msg = (body && (body.msg || body.message || body.error_description || body.error)) || ('HTTP ' + resp.status);
+                console.error('[NENGuard Reset] updateUser failed:', resp.status, body);
+                showFormError('Fehler: ' + msg);
                 btn.disabled = false;
                 loading.style.display = 'none';
                 return;
             }
+
+            console.log('[NENGuard Reset] password updated successfully');
             show('state-success');
         } catch (e) {
+            console.error('[NENGuard Reset] updateUser threw', e);
             showFormError('Fehler: ' + (e && e.message ? e.message : 'unbekannt'));
             btn.disabled = false;
             loading.style.display = 'none';
